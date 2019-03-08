@@ -20,61 +20,75 @@ def gaussian(x,y):
     return math.exp(-x**2/2-y**2/2)
 
 # function studied
-def f(t):
-    return gaussian(t)
+def f(x,y):
+    return gaussian(x,y)
 
+# same as f, but the returned value is zero if (x,y) is out of the boundaries
+def f_with_constraints(x,y,boundaries):
+    for b in boundaries:
+        if b[0]*x + b[1]*y > b[2] :
+            return 0
+    return f(x,y)
+
+# distribution studied
 def random_distrib():
     #return [random.uniform(-1,1),random.uniform(-1,1)]
     return [random.gauss(0,1),random.gauss(0,1)]
 
-##no 2d adapted after this
-# computes MSE between 2 adjacent decision thresholds
-def interval_MSE(x,t1,t2):
-    return integrate.quad(lambda t: ((t - x)**2) * f(t), t1, t2)[0]
+## not 2-d adapted after this
+# computes MSE inside one region
+def region_MSE(x,germs,boundaries):
+    return integrate.dblquad(lambda x,y: ((t - x)**2) * f(t), t1, t2)[0]# to complete
 
 # computes mean square error on R
-def MSE(t,x):
-    s = interval_MSE(x[0], -float('Inf'), t[0]) + interval_MSE(x[-1], t[-1], float('Inf'))
-    for i in xrange(1,len(x)-1):
+def MSE(germs,boundaries):
+    s = 0
+    for i in xrange(len(germs)):
         s = s + interval_MSE(x[i], t[i-1], t[i])
-    return s
+    return s/len(germs)
 
-# t1 and t2 are the boundaries of the interval on which the centroid is calculated
-def centroid(t1,t2):
-    if integrate.quad(f, t1, t2)[0] == 0 or t1 == t2:
+# boundaries is an array containing the constraints on the function
+def centroid(boundaries):
+    if integrate.quad(f, t1, t2)[0] == 0 or t1 == t2:#to complete: if  area == 0
         return 0
     else:
-        return integrate.quad(lambda t:t*f(t), t1, t2)[0] / integrate.quad(f, t1, t2)[0]
+        return integrate.quad(lambda x,y:t*f(t), t1, t2)[0] / integrate.quad(f, t1, t2)[0]#to complete
 
-# t is an array containing the initial decision boundaries
-# x is an array containing the representation levels
+def adjust_boundaries(germs,k):
+    bounds = []
+    main_germ = germs[i]
+    for i in xrange(germs[i]):
+        bounds.append() # to complete
+    return bounds
+
+# boundaries is an array containing the initial decision boundaries (array of n-1 constraints)
+# constraints' model is [a1,a2,b] parameters of the equation a1*x + a2*y <= b
+# germs is an array containing the germ for each region, on the model [x,y]
 # error_threshold is the threshold to reach for the algorithm to stop
-def maxlloyd(t,x,error_threshold):
-    e = MSE(t,x)
-    error = [e]
-    c = 0
+def maxlloyd(boundaries,germs,error_threshold):
+    e = MSE(boundaries,germs)
+    error = [e] # store the evolution of MSE through the loop
+    c = 0 # counts the number of executions of the loop
     while e > error_threshold and c < 300:
         c = c+1
         if c%2 == 1:
             # adjust boundaries
-            for i in xrange(len(t)):
-                t[i] = 0.5 * ( x[i] + x[i+1] )
+            for i in xrange(len(boundaries)):
+                boundaries[i] = adjust_boundaries(germs,i)
         else:
-            # adjust levels
-            x[0] = centroid(-float('Inf'), t[0])
-            x[-1] = centroid(t[-1], float('Inf'))
-            for i in xrange(1,len(x)-1):
-                x[i] = centroid(t[i-1], t[i])
-        e = MSE(t,x)
+            # adjust germs
+            for i in xrange(len(germs)):
+                germs[i] = centroid(boundaries[i])
+        e = MSE(boundaries,germs)
         error.append(e)
-    return x,t,error
+    return germs,boundaries,error
 
 
 # Test of maxlloyd function
 def test_maxlloyd():
-    t = [-0.5,0,0.5]
-    x = [-1,0,1,1.5]
-    x2,t2,error = maxlloyd(t,x,0.1)
+    b = [-0.5,0,0.5]
+    g = [[0,0],[1,1],[-1,-1]]
+    x2,t2,error = maxlloyd(b,l,0.1)
     print x2,t2
     plt.plot(error)
     plt.show()
@@ -102,7 +116,7 @@ def plot_avg_error(N):
     plt.plot(avg_E)
     plt.show()
 
-plot_avg_error(20000)
+#plot_avg_error(20000)
 
 
 

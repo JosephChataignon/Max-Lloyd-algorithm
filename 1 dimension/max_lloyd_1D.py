@@ -21,17 +21,18 @@ def gaussian(t):
 
 # function studied: chose between uniform and gaussian functions
 def f(t):
-    return gaussian(t)
+    return uniform(t)
 
+# distribution studied
 def random_distrib():
-    #return random.uniform(-1,1)
-    return random.gauss(0,1)
+    return random.uniform(-1,1)
+    #return random.gauss(0,1)
 
-# computes MSE between 2 adjacent decision thresholds
+# computes MSE between 2 adjacent decision thresholds (on one segment)
 def interval_MSE(x,t1,t2):
     return integrate.quad(lambda t: ((t - x)**2) * f(t), t1, t2)[0]
 
-# computes mean square error on R
+# computes mean squared error on R
 def MSE(t,x):
     s = interval_MSE(x[0], -float('Inf'), t[0]) + interval_MSE(x[-1], t[-1], float('Inf'))
     for i in xrange(1,len(x)-1):
@@ -66,6 +67,7 @@ def maxlloyd(t,x,error_threshold):
                 x[i] = centroid(t[i-1], t[i])
         e = MSE(t,x)
         error.append(e)
+        print e
     return x,t,error
 
 
@@ -73,13 +75,13 @@ def maxlloyd(t,x,error_threshold):
 def test_maxlloyd():
     t = [-0.5,0,0.5]
     x = [-1,0,1,1.5]
-    x2,t2,error = maxlloyd(t,x,0.1)
+    x2,t2,error = maxlloyd(t,x,0.01)
     print x2,t2
     plt.plot(error)
     plt.show()
     return x2,t2
 
-# test_maxlloyd()
+test_maxlloyd()
 
 def estimate(x,t,value):
     for i in xrange(len(t)):
@@ -101,7 +103,7 @@ def plot_avg_error(N):
     plt.plot(avg_E)
     plt.show()
 
-plot_avg_error(20000)
+# plot_avg_error(20000)
 
 
 
