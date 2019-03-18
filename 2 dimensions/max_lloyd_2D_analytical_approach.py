@@ -1,3 +1,6 @@
+# Warning!
+# This approach didn't work because of the calculations of integrals, the code is still not operationnal
+
 
 # Max-Lloyd algorithm for finding the optimal quantizer
 # in dimension 2
@@ -17,10 +20,12 @@ def uniform(x,y):
         return 0
 
 def gaussian(x,y):
-    return math.exp(-x**2/2-y**2/2)
+    return math.exp((-(x**2)-(y**2))/2)
 
 # function studied
 def f(x,y):
+    if x**2+y**2 > 10:
+        return 0
     return gaussian(x,y)
 
 # distribution studied
@@ -31,16 +36,15 @@ def random_distrib():
 # indicator function: returns 1 if x is in the boundaries, 0 otherwise
 def is_part_of_region(x, y, boundaries):
     for b in boundaries:
-        print b
         if b[0]*x + b[1]*y > b[2] :
             return 0
     return 1
 
 # same as f, but the returned value is zero if (x,y) is out of the boundaries
-# here the array boundaries only contains the boundaries for the concerned region
-def f_with_constraints(x,y,boundaries):
-    if is_part_of_region(x, y, boundaries) == 1:
-        return f(x,y)
+# here the array boundaries only contains the boundaries for one region
+def f_with_constraints(u,v,boundaries):
+    if is_part_of_region(u,v, boundaries) == 1:
+        return f(u,v)
     else:
         return 0
 
@@ -56,10 +60,11 @@ def Sy(z,boundaries):
 # here the array boundaries only contains the boundaries for the region of x
 def region_MSE(x,boundaries):
     y = lambda u,v: f_with_constraints(u,v,boundaries) * ((u-x[0])**2+(v-x[1])**2)
-    return integrate.dblquad( y, -float('Inf'), float('Inf'), -float('Inf'), float('Inf'))[0]
+    return 0#integrate.dblquad( y, -float('Inf'), float('Inf'), -float('Inf'), float('Inf'))[0]
 
 # computes mean squared error on R
 def MSE(germs,boundaries):
+    print "MSE"
     s = 0
     for i in xrange(len(germs)):
         s = s + region_MSE(germs[i],boundaries[i])
@@ -67,79 +72,92 @@ def MSE(germs,boundaries):
 
 # boundaries is an array containing the constraints for one region
 def centroid(boundaries):
-    Cx = integrate.quad(lambda z: z*Sx(z,boundaries), -float('Inf'), float('Inf'))[0]
-    Cx = Cx / integrate.quad(lambda z: Sx(z,boundaries), -float('Inf'), float('Inf'))[0]
-    Cy = integrate.quad(lambda z: z*Sy(z,boundaries), -float('Inf'), float('Inf'))[0]
-    Cy = Cy / integrate.quad(lambda z: Sy(z,boundaries), -float('Inf'), float('Inf'))[0]
+    print "centroid"
+    Cx = integrate.quad(lambda z: Sx(z,boundaries), -10, 10)[0]
+    if Cx != 0:
+        Cx = integrate.quad(lambda z: z*Sx(z,boundaries), -10, 10)[0] / Cx
+    else:
+        Cx = 0
+    Cy = integrate.quad(lambda z: Sy(z,boundaries), -10, 10)[0]
+    if Cy != 0:
+        Cy = integrate.quad(lambda z: z*Sy(z,boundaries), -10, 10)[0] / Cy
+    else:
+        Cy = 0
     return [Cx,Cy]
 
-
+# germs is an array containing all the germs
 def adjust_boundaries(germs,k):
+    print "boundaries"
     bounds = []
     main_germ = germs[k]
     for i in xrange(len(germs)):
-        a1 = 2*( germs[i][0] - main_germ[0] )
-        a2 = 2*( germs[i][1] - main_germ[1] )
-        b  = germs[i][0]**2 + germs[i][1]**2 - main_germ[0] - main_germ[1]
-        bounds.append([a1,a2,b]) 
+        if i != k:
+            a1 = 2*( germs[i][0] - main_germ[0] )
+            a2 = 2*( germs[i][1] - main_germ[1] )
+            b  = germs[i][0]**2 + germs[i][1]**2 - main_germ[0] - main_germ[1]
+            bounds.append([a1,a2,b]) 
     return bounds
 
 # boundaries is an array containing the initial decision boundaries (array of n-1 constraints)
 # constraints' model is [a1,a2,b] parameters of the equation a1*x + a2*y <= b
 # germs is an array containing the germ for each region, on the model [x,y]
 # error_threshold is the threshold to reach for the algorithm to stop
-def maxlloyd(boundaries,germs,error_threshold):
-    e = MSE(boundaries,germs)
-    error = [e] # store the evolution of MSE through the loop
+def maxlloyd(germs,boundaries,error_threshold):
+    print "test fonction  maxlloyd"
+    e = error_threshold+1
+    error = [] # store the evolution of MSE through the loop
     c = 0 # counts the number of executions of the loop
-    while e > error_threshold and c < 300:
+    while c < 10:#e > error_threshold and c < 10:
         c = c+1
+        print c
         if c%2 == 1:
             # adjust boundaries
+            print "adjust boundaries"
             for i in xrange(len(boundaries)):
                 boundaries[i] = adjust_boundaries(germs,i)
         else:
             # adjust germs
+            print "adjust germs"
             for i in xrange(len(germs)):
                 germs[i] = centroid(boundaries[i])
-        e = MSE(boundaries,germs)
+        e = MSE(germs,boundaries)
         error.append(e)
     return germs,boundaries,error
 
-[0,0,0],
+
 # Test of maxlloyd function
 def test_maxlloyd():
     g = [[1,1],[0,0],[2,1],[-1,2],[2,-1],[-4,-4]]
-    b = [[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]]
+    b = [[[0,0,0]]*5]*6
     g2,b2,error = maxlloyd(g,b,0.1)
-    print x2,t2
+    print g2,b2
     plt.plot(error)
     plt.show()
-    return x2,t2
+    return g2,b2
 
-test_maxlloyd()
+#test_maxlloyd()
 
-def estimate(x,t,value):
-    for i in xrange(len(t)):
-        if t[i] > value:
-            return x[i]
-    return x[-1]
 
-# Plot of average error
-def plot_avg_error(N):
-    x,t = test_maxlloyd()
-    avg_E = []
-    realizations = []
-    square_error = []
-    for i in xrange(N):
-        realizations.append(random_distrib())
-        square_error.append((realizations[-1] - estimate(x,t,realizations[-1]))**2)
-        avg_E.append(sum(square_error)/len(square_error))
+
+
+def test_is_part_of_region():
+    g = [[1.0,1.0],[0.0,0.0],[2.0,1.0],[-1.0,2.0],[2.0,-1.0],[-4.0,-4.0]]
+    b = [[[0.0,0.0,0.0]]*5]*6
+    for i in xrange(len(b)):
+        b[i] = adjust_boundaries(g,i)
+    tab = []
+    
+    for i in xrange(100):
+        for j in xrange(100):
+            z = is_part_of_region(i/10-5,j/10-5,b[5])
+            tab.append([i/10-5,j/10-5,z])
     plt.figure(2)
-    plt.plot(avg_E)
+    for point in tab:
+        if point[2] == 0:
+            plt.plot(point[0],point[1],'bo')
+        else:
+            plt.plot(point[0],point[1],'ro')
     plt.show()
-
-#plot_avg_error(20000)
 
 
 
