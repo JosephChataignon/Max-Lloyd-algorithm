@@ -15,14 +15,15 @@ def uniform(x,y):
     if x<=1 and x>=-1 and y<=1 and y>=-1:
         return 0.25
     else:
-        return 0
+        return 0.0
 
 def gaussian(x,y):
     return math.exp((-(float(x)**2.0)-(float(y)**2.0))/2.0)
 
 # function studied
 def f(x,y):
-    return gaussian(x,y)
+    #return gaussian(x,y)
+    return uniform(x,y)
 
 # distribution studied
 def random_distrib():
@@ -36,7 +37,6 @@ def sqdistance(point1,point2):
 
 # computes mean squared error on R
 def MSE(germs,grid):
-    print "MSE"
     s = 0
     for i in xrange(len(grid)):
         for j in xrange(len(grid[0])):
@@ -47,7 +47,6 @@ def MSE(germs,grid):
 
 # k is the index of the germ to adjust
 def centroid(grid,k):
-    print "centroid"
     Cx = 0.0; Cy = 0.0; total_proba = 0.0
     for i in xrange(len(grid)):
         for j in xrange(len(grid[i])):
@@ -65,7 +64,6 @@ def centroid(grid,k):
 
 #germs is an array containing all the germs
 def adjust_grid(germs,grid_dim):
-    print "grid"
     grid = np.array([[0]*grid_dim[0]]*grid_dim[1])
     for i in xrange(len(grid)):
         for j in xrange(len(grid[0])):
@@ -88,16 +86,14 @@ def maxlloyd(germs,error_threshold,grid_dim):
     error = [] # store the evolution of MSE through the loop
     c = 0 # counts the number of executions of the loop
     grid = np.array([[0]*grid_dim[0]]*grid_dim[1])
-    while e > error_threshold and c < 10:
+    while e > error_threshold and c < 100:
         c = c+1
         print c
         if c%2 == 1:
             # adjust grid
-            print "adjust grid"
             grid = adjust_grid(germs,grid_dim)
         else:
             # adjust germs
-            print "adjust germs"
             for i in xrange(len(germs)):
                 germs[i] = centroid(grid,i)
         e = MSE(germs,grid)
@@ -108,7 +104,7 @@ def maxlloyd(germs,error_threshold,grid_dim):
 # Test of maxlloyd function
 def test_maxlloyd():
     germs = [[1.0,1.0],[-1.0,2.0],[0.0,0.0],[2.0,1.0]]
-    germs,grid,error = maxlloyd(germs,0.1,[15,15])
+    germs,grid,error = maxlloyd(germs,0.1,[100,100])
     #plt.plot(error)
     #plt.show()
     plt.figure(2)
@@ -125,7 +121,7 @@ def test_maxlloyd():
     plt.show()
     return germs,grid
 
-#test_maxlloyd()
+test_maxlloyd()
 
 
 
@@ -147,28 +143,9 @@ def displayregions():
                 plt.plot(float(i)*10.0/15.0-5.0,float(j)*10.0/15.0-5.0,'bo')
     plt.show()
 
-displayregions()
+#displayregions()
 
 
-# test function for visualising the centroid of one region
-def displaycentroid():
-    germs = [[1.0,1.0],[-1.0,2.0],[0.0,0.0],[2.0,1.0]]
-    grid = adjust_grid(germs,[15,15])
-    t = 0
-    germs[t] = centroid(grid,t)
-    print germs[t]
-    plt.figure(2)
-    for i in xrange(len(grid)):
-        for j in xrange(len(grid[0])):
-            if sqdistance([i,j] , germs[t]) < 2:
-                plt.plot(float(i)*10.0/15.0-5.0,float(j)*10.0/15.0-5.0,'ro')
-            elif grid[i,j] == t:
-                plt.plot(float(i)*10.0/15.0-5.0,float(j)*10.0/15.0-5.0,'yo')
-            else:
-                plt.plot(float(i)*10.0/15.0-5.0,float(j)*10.0/15.0-5.0,'bo')
-    plt.show()
-
-displaycentroid()
 
 
 
