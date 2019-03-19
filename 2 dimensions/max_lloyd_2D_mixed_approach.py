@@ -1,6 +1,11 @@
-
+# -*- coding: utf-8 -*-
+#
 # Max-Lloyd algorithm for finding the optimal quantizer
-# in dimension 2
+# in dimension 2 or more
+#
+# This is a mixed approach to try to get results more efficiently than with the
+# numerical approach, and extended to higher dimensions
+
 
 import math
 import random
@@ -11,29 +16,36 @@ from scipy import integrate
 
 
 
-def uniform(x,y):
-    if x<=1 and x>=-1 and y<=1 and y>=-1:
-        return 0.25
+def uniform(position):
+    nbdimensions = len(position)
+    in_distribution = True
+    for k in xrange(nbdimensions):
+        if position[k]<-1 or position[k]>1:
+            in_distribution = False
+    if in_distribution:
+        return 2.0**(-nbdimensions)
     else:
         return 0.0
 
-def gaussian(x,y):
-    return math.exp((-(float(x)**2.0)-(float(y)**2.0))/2.0)
+def gaussian(position):
+    return np.exp(-0.5*position**2) / ((2.0*np.pi)**(len(position)*0.5))
 
 # function studied
-def f(x,y):
-    #return gaussian(x,y)
-    return uniform(x,y)
+def f(position):
+    return gaussian(position)
+    #return uniform(position)
 
 # distribution studied
 def random_distrib():
     #return [random.uniform(-1,1),random.uniform(-1,1)]
     return [random.gauss(0,1),random.gauss(0,1)]
 
-# squared distance between 2 points
-def sqdistance(point1,point2):
-    return (float(point1[0])-float(point2[0]))**2 + (float(point1[1])-float(point2[1]))**2
-
+# squared euclidian distance between x and y
+def sqdistance(x,y):
+    d = 0.0
+    for i in xrange(len(x)):
+        d = d + (x[i]-y[i])**2
+    return d
 
 # k is the index of the germ to adjust
 def centroid(grid,k):
@@ -52,38 +64,37 @@ def centroid(grid,k):
         Cx = 0; Cy = 0
     return [Cx,Cy]
 
-#germs is an array containing all the germs
-def adjust_grid(germs,grid_dim):
-    grid = np.array([[0]*grid_dim[0]]*grid_dim[1])
-    for i in xrange(len(grid)):
-        for j in xrange(len(grid[0])):
-            point = [float(i)*10.0/float(len(grid))-5.0 , float(j)*10.0/float(len(grid[0]))-5.0]
-            nearest = 0
-            for k in xrange(1,len(germs)):
-                if sqdistance(point,germs[k]) < sqdistance(point,germs[nearest]):
-                    nearest = k
-            grid[i,j] = nearest
-    return grid
+# germs is an array containing all the germs
+def adjust_regions(germs):
+    nbdimensions = len(germs[0]) # number of dimensions
+    nbregions = len(germs) # number of regions (or number of germs)
+    regions = np.array( [ [ [0.0]*(nbdimensions+1) ]*nbregions ]*nbregions )
+    for i in xrange(nbregions):
+        for j in xrange(nbregions):
+            if i == j:
+                #to complete: case
+                print "not implemented yet"
+            else:
+                regions[i,j] = 
+    return regions
 
 
-# grid is a regular grid which covers the plane around the point (0,0). The
-# integer contained at each point is the index of the nearest germ from this point
-# germs is an array containing the germ for each region, on the model (x,y)
-# error_threshold is the threshold to reach for the algorithm to stop
-def maxlloyd(germs,grid_dim):
-    print "test fonction  maxlloyd"
+# constraints' model is [a1,a2,...an,b] parameters of the equation a1*x1 + a2*x2 + ... + an*xn <= b
+def maxlloyd(germs,griddimensions):
     c = 0 # counts the number of executions of the loop
-    grid = np.array([[0]*grid_dim[0]]*grid_dim[1])
+    nbdimensions = len(germs[0]) # number of dimensions
+    nbregions = len(germs) # number of regions
+    regions = np.array( [ [ [0.0]*(nbdimensions+1) ]*nbregions ]*nbregions )
     while c < 100:
         c = c+1
         print c
         if c%2 == 1:
-            # adjust grid
-            grid = adjust_grid(germs,grid_dim)
+            # adjust regions
+            grid = adjust_regions(germs,grid_dim)
         else:
             # adjust germs
             for i in xrange(len(germs)):
-                germs[i] = centroid(grid,i)
+                germs[i] = centroid(regions,i)
     return germs,grid
 
 

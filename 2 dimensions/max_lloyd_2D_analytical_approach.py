@@ -1,9 +1,11 @@
+# -*- coding: utf-8 -*-
+#
+# Max-Lloyd algorithm for finding the optimal quantizer
+# in dimension 2
+#
 # Warning!
 # This approach didn't work because of the calculations of integrals, the code is still not operationnal
 
-
-# Max-Lloyd algorithm for finding the optimal quantizer
-# in dimension 2
 
 import math
 import random

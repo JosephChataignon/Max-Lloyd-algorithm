@@ -1,6 +1,10 @@
-
+# -*- coding: utf-8 -*-
+#
 # Max-Lloyd algorithm for finding the optimal quantizer
 # in dimension 2
+#
+# This is a numerical approach started to get results when the analytical 
+# approach didn't work
 
 import math
 import random
@@ -69,9 +73,7 @@ def adjust_grid(germs,grid_dim):
 # grid is a regular grid which covers the plane around the point (0,0). The
 # integer contained at each point is the index of the nearest germ from this point
 # germs is an array containing the germ for each region, on the model (x,y)
-# error_threshold is the threshold to reach for the algorithm to stop
 def maxlloyd(germs,grid_dim):
-    print "test fonction  maxlloyd"
     c = 0 # counts the number of executions of the loop
     grid = np.array([[0]*grid_dim[0]]*grid_dim[1])
     while c < 100:
