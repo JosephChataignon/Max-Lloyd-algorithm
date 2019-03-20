@@ -73,10 +73,10 @@ def adjust_grid(germs,grid_dim):
 # grid is a regular grid which covers the plane around the point (0,0). The
 # integer contained at each point is the index of the nearest germ from this point
 # germs is an array containing the germ for each region, on the model (x,y)
-def maxlloyd(germs,grid_dim):
+def maxlloyd(germs,grid_dim,iterations):
     c = 0 # counts the number of executions of the loop
     grid = np.array([[0]*grid_dim[0]]*grid_dim[1])
-    while c < 100:
+    while c < iterations:
         c = c+1
         print c
         if c%2 == 1:
@@ -94,7 +94,8 @@ def test_maxlloyd():
     #germs = [[1.0,1.0],[-1.0,2.0],[0.0,0.0],[2.0,1.0]]
     germs = [[1.0,1.0],[-1.0,2.0],[0.0,0.0],[2.0,1.0],[1.0,-1.0],[-1.0,-2.0],[3.0,-2.0],[3.0,1.0]]
     grid_dim = [100,100]
-    germs,grid = maxlloyd(germs,grid_dim)
+    iterations = 100
+    germs,grid = maxlloyd(germs,grid_dim,iterations)
     plt.figure(2)
     colors = ['b', 'c', 'y', 'm', 'r', 'g', 'k', 'w']
     for i in xrange(len(grid)):
