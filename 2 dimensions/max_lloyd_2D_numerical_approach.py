@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Max-Lloyd algorithm for finding the optimal quantizer
+# Max-Lloyd algorithm for finding an optimal quantizer
 # in dimension 2
 #
 # This is a numerical approach started to get results when the analytical 
@@ -41,7 +41,7 @@ def sqdistance(point1,point2):
 
 # k is the index of the germ to adjust
 def centroid(grid,k):
-    Cx = 0.0; Cy = 0.0; total_proba = 0.0
+    Cx = 0. ; Cy = 0. ; total_proba = 0.
     for i in xrange(len(grid)):
         for j in xrange(len(grid[i])):
             if grid[i,j] == k:
@@ -52,8 +52,8 @@ def centroid(grid,k):
     if total_proba != 0:
         Cx = Cx / total_proba
         Cy = Cy / total_proba
-    else:
-        Cx = 0; Cy = 0
+    else: # if the cumulated probabilities on the whole region are equal 0
+        Cx = 0. ; Cy = 0.
     return [Cx,Cy]
 
 #germs is an array containing all the germs
@@ -89,7 +89,7 @@ def maxlloyd(germs,grid_dim,iterations):
     return germs,grid
 
 
-# Test of maxlloyd function
+# Test for maxlloyd function
 def test_maxlloyd():
     #germs = [[1.0,1.0],[-1.0,2.0],[0.0,0.0],[2.0,1.0]]
     germs = [[1.0,1.0],[-1.0,2.0],[0.0,0.0],[2.0,1.0],[1.0,-1.0],[-1.0,-2.0],[3.0,-2.0],[3.0,1.0]]

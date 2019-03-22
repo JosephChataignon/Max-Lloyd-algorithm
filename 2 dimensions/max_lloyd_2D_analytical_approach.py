@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 #
-# Max-Lloyd algorithm for finding the optimal quantizer
+# Max-Lloyd algorithm for finding an optimal quantizer
 # in dimension 2
 #
 # Warning!
-# This approach didn't work because of the calculations of integrals, the code is still not operationnal
+# This approach didn't work because of the calculations of integrals, the code
+# is still not functionning
 
 
 import math
@@ -127,7 +128,7 @@ def maxlloyd(germs,boundaries,error_threshold):
     return germs,boundaries,error
 
 
-# Test of maxlloyd function
+# Test for maxlloyd function
 def test_maxlloyd():
     g = [[1,1],[0,0],[2,1],[-1,2],[2,-1],[-4,-4]]
     b = [[[0,0,0]]*5]*6
