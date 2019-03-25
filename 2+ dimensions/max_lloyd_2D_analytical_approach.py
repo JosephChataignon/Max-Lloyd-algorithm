@@ -63,7 +63,7 @@ def Sy(z,boundaries):
 # here the array boundaries only contains the boundaries for the region of x
 def region_MSE(x,boundaries):
     y = lambda u,v: f_with_constraints(u,v,boundaries) * ((u-x[0])**2+(v-x[1])**2)
-    return 0#integrate.dblquad( y, -float('Inf'), float('Inf'), -float('Inf'), float('Inf'))[0]
+    return integrate.dblquad( y, -float('Inf'), float('Inf'), -float('Inf'), float('Inf'))[0]
 
 # computes mean squared error on R
 def MSE(germs,boundaries):
