@@ -71,7 +71,7 @@ def isinregion(point,regions):
 def MSE(regions, germs, griddimensions):
     error = 0.
     total_proba = 0. # cumulated probabilities in region k, initialized as 0
-    # Here is the same loop structure as in the centroid function
+    # Here is the same loop structure as in the centroid function, see below
     indexes = [0 for x in xrange(len(griddimensions))]  # initialize the loops indexes
     indexes[-1] -= 1                                    # before 1st incrementation
     indmax = len(griddimensions)-1  # index of the last loop (most internal one)
@@ -87,12 +87,17 @@ def MSE(regions, germs, griddimensions):
             else: break # index[x] is inside bounds, break and execute loop content
         if endloop: break
         # Actual loop content
-        index_coord = [float(indexes[x])*10./griddimensions[x]-5. for x in xrange(len(indexes))] # correspondance between indexes and coordinate system
+        # index_coord is a point of the space - correspondance between indexes and coordinate system:
+        index_coord = [float(indexes[x])*10./griddimensions[x]-5. for x in xrange(len(indexes))]
+        # find the centroid of the region this point is belonging to
         regioncenter = germs[isinregion(index_coord,regions)]
+        # get the probability density on that point
         proba_density = f(index_coord)
+        # add it to the total of probabilities
         total_proba += proba_density
+        # augment error with the appropriate value
         error += proba_density * sqdistance( regioncenter , index_coord )
-    if total_proba != 0: # should be equal to 1
+    if total_proba != 0: # total_proba should be equal to 1
         error /= total_proba
     else:
         print "ERROR: total_proba = 0"
