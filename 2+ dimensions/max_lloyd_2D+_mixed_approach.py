@@ -166,6 +166,7 @@ def maxlloyd(germs,griddimensions,iterations):
     nbdimensions = len(germs[0])    # number of dimensions
     nbregions = len(germs)          # number of regions
     regions = np.array( [ [ [0.0]*(nbdimensions+1) ]*nbregions ]*nbregions )
+    print "number of regions:",len(germs)
     while c < iterations:
         c = c+1
         if c%2 == 1:
@@ -225,8 +226,8 @@ def measure_error(iterations,griddimensions,number_of_regions,number_of_repeats)
 ## This function measures the evolution of MSE over increasing number of regions
 def error_evolution(iterations,griddimensions,number_of_repeats,encoding_size):
     error_values = []
-    for n in xrange(1,encoding_size):
-        error_values.append(measure_error(iterations,griddimensions,2**n,number_of_repeats))
+    for n in xrange(1,encoding_size+1):
+        error_values.append(measure_error(iterations,griddimensions,n**len(griddimensions),number_of_repeats))
     return error_values
 #print error_evolution(10,[15,15,15],3)
 
@@ -235,8 +236,8 @@ def error_evolution(iterations,griddimensions,number_of_repeats,encoding_size):
 # iterations is the number of iterations on maxlloyd function
 # number of repeats is the number of times calculations are repeated to measure average error
 # n_dimensions is the number of dimensions for which error evolution is computed
-# encoding size is the maximal number of bits for the quantizer output
-# ie for n<encoding_size, the number of regions is 2**n
+# encoding size is the maximal number of regions per axis
+# ie for n <= encoding_size, the number of regions is n**dimensions
 def display_error(iterations,gridresolution,number_of_repeats,n_dimensions,encoding_size):
     plt.figure(1)
     for d in xrange(1,n_dimensions):
@@ -246,7 +247,7 @@ def display_error(iterations,gridresolution,number_of_repeats,n_dimensions,encod
         plt.plot(error,label='%d dimensions'%d)
     plt.legend(loc='upper right')
     plt.show()
-display_error(iterations=20,gridresolution=100,number_of_repeats=10,n_dimensions=5,encoding_size=8)
+display_error(iterations=10,gridresolution=50,number_of_repeats=1,n_dimensions=4,encoding_size=6)
 
 
 
