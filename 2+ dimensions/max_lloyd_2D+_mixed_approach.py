@@ -36,25 +36,25 @@ def gaussian(position):
         p *= np.exp(-0.5*coord**2) / ((2.0*np.pi)**(len(position)*0.5))
     return p
 
-## function studied
 def f(position):
+    '''function studied'''
     return gaussian(position)
     #return uniform(position)
 
-## distribution studied
 def random_distrib():
+    '''distribution studied'''
     #return [random.uniform(-1,1),random.uniform(-1,1)]
     return [random.gauss(0,1),random.gauss(0,1)]
 
-## squared euclidian distance between x and y for any number of dimensions
 def sqdistance(x,y):
+    '''squared euclidian distance between x and y for any number of dimensions'''
     d = 0.0
     for i in xrange(len(x)):
         d += (x[i]-y[i])**2
     return d
 
-## returns the index of the region of which point is part of
 def isinregion(point,regions):
+    '''returns the index of the region of which point is part of'''
     for k in xrange(len(regions)): # for each region k
         isin = True
         for l in xrange(len(regions)): #for each region l distinct from k
@@ -65,10 +65,13 @@ def isinregion(point,regions):
             return k
     return -1
 
-## returns the mean squared error on the region between -5 and +5 for each axis
-# As for the centroid function that comes after, it is an approximation only
-# calculated on points of a grid in a limited area
 def MSE(regions, germs, griddimensions):
+    '''
+        Returns the mean squared error on the region between -5 and +5 for each 
+        axis.
+        As for the centroid function that comes after, it is an approximation 
+        only calculated on points of a grid in a limited area.
+    '''
     error = 0.
     total_proba = 0. # cumulated probabilities in region k, initialized as 0
     # Here is the same loop structure as in the centroid function, see below
@@ -104,11 +107,13 @@ def MSE(regions, germs, griddimensions):
         coord = np.zeros(len(griddimensions))
     return error
 
-## This function computes the centroid of the k-th region,
-# based on an estimation in each point of a grid. It is thus an approximation.
-# In particular it only takes into account a 10-width zone centered on zero 
-# and not the parts of the region that have coordinates <-5 or >5
 def centroid(regions,k,griddimensions):
+    '''
+        This function computes the centroid of the k-th region, based on an 
+        estimation in each point of a grid. It is thus an approximation. In 
+        particular it only takes into account a 10-width zone centered on zero 
+        and not the parts of the region that have coordinates <-5 or >5
+    '''
     coord = np.zeros(len(griddimensions))
     total_proba = 0. # cumulated probabilities in region k, initialized as 0
     # Here comes a particular loop structure, because the number of dimensions
@@ -141,9 +146,12 @@ def centroid(regions,k,griddimensions):
         coord = np.zeros(len(griddimensions))
     return coord
 
-## This function adjusts the delimitations of the regions based on their center
-# it builds a Voronoi diagram from an array containing a germ for each region
 def adjust_regions(germs):
+    '''
+        This function adjusts the delimitations of the regions based on their
+        center. It builds a Voronoi diagram from an array containing a germ for 
+        each region.
+    '''
     nbdimensions = len(germs[0])    # number of dimensions
     nbregions = len(germs)          # number of regions (or number of germs)
     regions = np.array( [ [ [0.0]*(nbdimensions+1) ]*nbregions ]*nbregions )
@@ -161,12 +169,14 @@ def adjust_regions(germs):
                     regions[i,j,:] = regions[i,j,:] / np.abs(b)
     return regions
 
-## This function is the actual implementation of Max-Lloyd algorithm
-# regions delimiters are a set of variables [a1,a2,...an,b] , which are 
-# parameters of the equation a1*x1 + a2*x2 + ... + an*xn + b <= 0
-# griddimensions indicates the number of points on each axis that are used for
-# estimating the centroid of a region
 def maxlloyd(germs,griddimensions,iterations):
+    '''
+        Actual implementation of Max-Lloyd algorithm.
+        Regions delimiters are a set of variables [a1,a2,...an,b] , which are 
+        parameters of the equation a1*x1 + a2*x2 + ... + an*xn + b <= 0
+        griddimensions indicates the number of points on each axis that are used for
+        estimating the centroid of a region.
+    '''
     c = 0                           # counts the number of iterations
     nbdimensions = len(germs[0])    # number of dimensions
     nbregions = len(germs)          # number of regions
@@ -184,8 +194,8 @@ def maxlloyd(germs,griddimensions,iterations):
     return germs,regions
 
 
-## function for visualising the regions, 2D only, for a number of regions <= 8
 def displayregions(griddimensions,regions):
+    '''visualizes the regions, in 2D only, for a number of regions <= 8'''
     plt.figure(2)
     colors = ['b', 'c', 'y', 'm', 'r', 'g', 'w', 'k']
     for i in xrange(griddimensions[0]):
@@ -194,8 +204,8 @@ def displayregions(griddimensions,regions):
             plt.plot(i2,j2,marker='o',color=colors[isinregion(point,regions)])
     plt.show()
 
-## Test for displayregions function, only with regions from initial germs
 def test_displayregions():
+    '''Test for displayregions function, only with regions from initial germs'''
     germs = np.array([[1.0,1.0],[-1.0,2.0],[0.0,0.0],[2.0,1.0],[1.0,-1.0],[-1.0,-2.0],[3.0,-2.0],[3.0,1.0]])
     regions = adjust_regions(germs)
     print regions,"\n"
@@ -203,8 +213,8 @@ def test_displayregions():
 #test_displayregions() # uncomment to test
 
 
-## Test for maxlloyd function
 def test_maxlloyd():
+    '''Test for maxlloyd function'''
     germs = np.array([[1.,1.],[-1.,2.] ,[0.,0.],[2.,1.],[1.,-1.],[-1.,-2.],[3.,-2.],[3.,1.]])
     grid_dim = [60,60]
     iterations = 20
@@ -214,8 +224,8 @@ def test_maxlloyd():
     return germs,regions
 #test_maxlloyd() # uncomment to test
 
-## This function measures the MSE depending on the number of regions
 def measure_error(iterations,griddimensions,number_of_regions,number_of_repeats):
+    '''measures the MSE depending on the number of regions'''
     error = 0.
     for i in xrange(number_of_repeats):
         germs = []
@@ -228,27 +238,34 @@ def measure_error(iterations,griddimensions,number_of_regions,number_of_repeats)
     return error
 #print measure_error(10,[15,15],4,3)
 
-## This function measures the evolution of MSE over increasing number of regions
 def error_evolution(iterations,griddimensions,number_of_repeats,encoding_size):
+    '''measures the evolution of MSE over increasing number of regions'''
     error_values = []
     for n in xrange(1,encoding_size+1):
         error_values.append(measure_error(iterations,griddimensions,n**len(griddimensions),number_of_repeats))
     return error_values
 #print error_evolution(10,[15,15,15],3)
 
-## This function displays the evolution of MSE for several dimensions
-# gridresolution is the number of points on one axis of the grid
-# iterations is the number of iterations on maxlloyd function
-# number of repeats is the number of times calculations are repeated to measure average error
-# n_dimensions is the number of dimensions for which error evolution is computed
-# encoding size is the maximal number of regions per axis
-# ie for n <= encoding_size, the number of regions is n**dimensions
 def display_error(iterations,gridresolution,number_of_repeats,n_dimensions,encoding_size):
+    '''
+        This function displays the evolution of MSE for several dimensions.
+        gridresolution is the number of points on one axis of the grid.
+        iterations is the number of iterations on maxlloyd function.
+        number of repeats is the number of times calculations are repeated to 
+        measure average error.
+        n_dimensions is the number of dimensions for which error evolution is 
+        computed.
+        encoding_size is the maximal number of regions per axis,
+        ie for n <= encoding_size, the number of regions is n**dimensions
+    '''
     plt.figure(1)
     for d in xrange(1,n_dimensions):
         print "dimension",d
         griddimensions = [gridresolution for i in xrange(d)]
-        error = error_evolution(iterations,griddimensions,number_of_repeats,encoding_size)
+        if d == 3: # last 2 are not computed due to very high computation time needed
+            error = error_evolution(iterations,griddimensions,number_of_repeats,encoding_size-2)
+        else:
+            error = error_evolution(iterations,griddimensions,number_of_repeats,encoding_size)
         plt.plot(error,label='%d dimensions'%d)
     plt.legend(loc='upper right')
     plt.show()
