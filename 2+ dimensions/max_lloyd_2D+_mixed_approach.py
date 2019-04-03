@@ -262,8 +262,8 @@ def display_error(iterations,gridresolution,number_of_repeats,n_dimensions,encod
     for d in xrange(1,n_dimensions):
         print "dimension",d
         griddimensions = [gridresolution for i in xrange(d)]
-        if d == 3: # last 2 are not computed due to very high computation time needed
-            error = error_evolution(iterations,griddimensions,number_of_repeats,encoding_size-2)
+        if d == 3: # last 3 are not computed due to very high computation time needed
+            error = error_evolution(iterations,griddimensions,number_of_repeats,encoding_size-3)
         else:
             error = error_evolution(iterations,griddimensions,number_of_repeats,encoding_size)
         plt.plot(error,label='%d dimensions'%d)
