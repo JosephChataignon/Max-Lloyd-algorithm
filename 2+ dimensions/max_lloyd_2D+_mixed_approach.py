@@ -38,13 +38,13 @@ def gaussian(position):
 
 def f(position):
     '''function studied'''
-    return gaussian(position)
-    #return uniform(position)
+    #return gaussian(position)
+    return uniform(position)
 
 def random_distrib():
     '''distribution studied'''
-    #return [random.uniform(-1,1),random.uniform(-1,1)]
-    return [random.gauss(0,1),random.gauss(0,1)]
+    return [random.uniform(-1,1),random.uniform(-1,1)]
+    #return [random.gauss(0,1),random.gauss(0,1)]
 
 def sqdistance(x,y):
     '''squared euclidian distance between x and y for any number of dimensions'''
@@ -193,6 +193,24 @@ def maxlloyd(germs,griddimensions,iterations):
                 germs[i] = centroid(regions,i,griddimensions)
     return germs,regions
 
+def performance():
+    '''generate figures with maxlloyd function for the paper'''
+    #germs = np.array([[0.,-1.],[0.,1.]])#2
+    #germs = np.array([[0.,-1.],[-0.75,0.25],[0.75,0.25]])#3
+    #germs = np.array([[0.5,-0.5],[-0.75,-0.75],[-0.25,0.]])#3bis
+    #germs = np.array([[0.,1.],[-1.,0.],[1.,0.],[0.,-1.]])#4
+    #germs = np.array([[-0.5,-0.5],[-0.5,0.5],[0.5,0.5],[0.5,-0.5]])#4bis
+    #germs = np.array([[-0.75,0.],[-0.25,0.8],[0.4,0.4],[0.7,-0.2]])#4ter
+    #germs = np.array([[-0.75,0.6],[-0.2,-0.3],[0.25,-0.63],[0.87,0.12]])#4quad
+    #germs = np.array([[-0.75,0.6],[-0.2,-0.3],[0.25,-0.63],[0.87,0.12],[-0.36,0.46],[0.83,-0.35],[-0.52,0.84] ])#7
+    
+    regionsnumber = 16
+    germs = np.reshape([np.random.random(regionsnumber*2)*2-1],(regionsnumber,2))
+    
+    germs, regions = maxlloyd(germs,[100,100],30)
+    m = MSE(regions,germs,[1000,1000])
+    print m
+    displayregions([30,30],regions)
 
 def displayregions(griddimensions,regions):
     '''visualizes the regions, in 2D only, for a number of regions <= 8'''
@@ -203,6 +221,8 @@ def displayregions(griddimensions,regions):
             i2 = float(i)*10.0/griddimensions[0]-5 ; j2 = float(j)*10.0/griddimensions[1]-5; point = np.array([i2,j2])
             plt.plot(i2,j2,marker='o',color=colors[isinregion(point,regions)])
     plt.show()
+
+performance()
 
 def test_displayregions():
     '''Test for displayregions function, only with regions from initial germs'''
@@ -269,7 +289,7 @@ def display_error(iterations,gridresolution,number_of_repeats,n_dimensions,encod
         plt.plot(error,label='%d dimensions'%d)
     plt.legend(loc='upper right')
     plt.show()
-display_error(iterations=10,gridresolution=50,number_of_repeats=1,n_dimensions=4,encoding_size=6)
+#display_error(iterations=10,gridresolution=50,number_of_repeats=1,n_dimensions=4,encoding_size=6)
 
 
 
