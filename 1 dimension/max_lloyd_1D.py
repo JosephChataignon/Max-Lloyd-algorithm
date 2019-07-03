@@ -35,7 +35,7 @@ def interval_MSE(x,t1,t2):
 # computes mean squared error on R
 def MSE(t,x):
     s = interval_MSE(x[0], -float('Inf'), t[0]) + interval_MSE(x[-1], t[-1], float('Inf'))
-    for i in xrange(1,len(x)-1):
+    for i in range(1,len(x)-1):
         s = s + interval_MSE(x[i], t[i-1], t[i])
     return s
 
@@ -57,17 +57,17 @@ def maxlloyd(t,x,error_threshold):
         c = c+1
         if c%2 == 1:
             # adjust thresholds
-            for i in xrange(len(t)):
+            for i in range(len(t)):
                 t[i] = 0.5 * ( x[i] + x[i+1] )
         else:
             # adjust levels
             x[0] = centroid(-float('Inf'), t[0])
             x[-1] = centroid(t[-1], float('Inf'))
-            for i in xrange(1,len(x)-1):
+            for i in range(1,len(x)-1):
                 x[i] = centroid(t[i-1], t[i])
         e = MSE(t,x)
         error.append(e)
-        print e
+        print(e)
     return x,t,error
 
 
@@ -76,7 +76,7 @@ def test_maxlloyd():
     t = [-0.5,0,0.5]
     x = [-1,0,1,1.5]
     x2,t2,error = maxlloyd(t,x,0.01)
-    print x2,t2
+    print(x2,t2)
     plt.plot(error)
     plt.show()
     return x2,t2
@@ -84,7 +84,7 @@ def test_maxlloyd():
 test_maxlloyd()
 
 def estimate(x,t,value):
-    for i in xrange(len(t)):
+    for i in range(len(t)):
         if t[i] > value:
             return x[i]
     return x[-1]
@@ -95,7 +95,7 @@ def plot_avg_error(N):
     avg_E = []
     realizations = []
     square_error = []
-    for i in xrange(N):
+    for i in range(N):
         realizations.append(random_distrib())
         square_error.append((realizations[-1] - estimate(x,t,realizations[-1]))**2)
         avg_E.append(sum(square_error)/len(square_error))
