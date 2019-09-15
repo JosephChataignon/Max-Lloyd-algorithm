@@ -1,5 +1,5 @@
 # Max-Lloyd-algorithm
-This repository contains an implementation of Lloyd-Max algorithm in Python. It is divided as follows:
+This repository contains an implementation of Lloyd-Max algorithm in Python, and its extension to higher dimensions (Linde-Buzo-Gray algorithm). It is divided as follows:
 - the folder "1 dimension" contains an algorithm for 1-dimensional problems, as well as a verification table
  of values to check the accuracy of results. It is the proper Max-Lloyd algorithm.
 - the folder "2+ dimensions" contains 3 code files corresponding to 3 different approaches of the problem in
